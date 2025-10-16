@@ -1,4 +1,4 @@
-import { SiCoursera } from "react-icons/si";
+
 
 const assignment = {
   id: 1, title: "NodeJS Assignment",
