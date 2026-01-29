@@ -26,7 +26,8 @@ app.use(cors({
     process.env.NETLIFY_URL,
     "http://localhost:5173",
     "http://localhost:3000",
-    "http://localhost:3001"
+    "http://localhost:3001", 
+    'https://a6--kanbas-web-app2.netlify.app'
   ].filter(Boolean),
 }));
 
