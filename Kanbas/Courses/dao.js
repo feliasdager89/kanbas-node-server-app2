@@ -16,7 +16,8 @@ export const findCourseById = (id) => {
 
 export const findCourseByName = (name) =>  model.findOne({ name: name });
 
-export const findCourseByCode = (code) =>  model.findOne({ code: code });
+// "number" is the course code in the frontend data
+export const findCourseByNumber = (number) =>  model.findOne({ number: number });
 
 export const deleteCourse = (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) return null;

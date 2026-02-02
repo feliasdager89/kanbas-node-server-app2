@@ -30,8 +30,8 @@ const createCourse = async (req, res) => {
     res.json(course);
   };
 
-  const findCourseByCode = async (req, res) => {
-    const course = await dao.findCourseByCode(req.params.code);
+  const findCourseByNumber = async (req, res) => {
+    const course = await dao.findCourseByNumber(req.params.number);
     res.json(course);
   };  
 
@@ -93,7 +93,7 @@ app.put("/api/courses/:id", (req, res) => {
   app.get("/api/courses", findAllCourses);
   app.get("/api/courses/:id", findCourseById);
   app.get("/api/courses/name/:name", findCourseByName);
-  app.get("/api/courses/code/:code", findCourseByCode);
+  app.get("/api/courses/number/:number", findCourseByNumber);
   app.put("/api/courses/:id", updateCourse);
   app.delete("/api/courses/:id", deleteCourseById);
 
