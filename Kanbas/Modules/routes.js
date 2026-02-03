@@ -4,11 +4,13 @@ import * as dao from "./dao.js"
 export default function ModuleRoutes(app) { 
 
   const createModule = async (req, res) => {
-    const module = await dao.createModule(req.body);
+    const { cid } = req.params;
+    const module = await dao.createModule({ ...req.body, course: cid });
     res.json(module);
   }
 
   const findAllModules = async (req, res) => {
+    const { cid } = req.params;
     const modules = await dao.findAllModules();
     res.json(modules);
   }
