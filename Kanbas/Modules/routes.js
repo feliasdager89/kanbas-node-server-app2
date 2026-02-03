@@ -31,9 +31,9 @@ export default function ModuleRoutes(app) {
     res.sendStatus(200);
   } 
 
-  app.get("/api/modules", findAllModules);
+  app.get("/api/courses/:cid/modules", findAllModules);
   app.get("/api/modules/:mid", findModuleById);
-  app.post("/api/modules", createModule);
+  app.post("/api/courses/:cid/modules", createModule);
   app.put("/api/modules/:mid", updateModule);
   app.delete("/api/modules/:mid", deleteModule);
 
