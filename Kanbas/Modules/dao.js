@@ -9,8 +9,8 @@ export const createModule = (module)=>{
 export const findAllModules = () => model.find();  
 
 export const findModuleByCourseId = (courseId) => {
-    if(!mongoose.Types.ObjectId.isValid(courseId)) return null
-    return model.find({ courseId: courseId });
+    // Course is stored as a string field `course` in schema
+    return model.find({ course: courseId });
 }
 
 export const findModuleById = (id) => {
