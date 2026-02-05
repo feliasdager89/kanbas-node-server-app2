@@ -1,10 +1,12 @@
 import mongoose from "mongoose"; 
 const moduleSchema = new mongoose.Schema({
-    title: { type: String, required: true },
+    name: { type: String, required: true },
     description: String,
-    courseId: { type: mongoose.Schema.Types.ObjectId, ref: "Course", required: true },
-    createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date, default: Date.now },
+    course: {type: String, required: true},
+    lessons: {
+      type: [mongoose.Schema.Types.Mixed],   
+      default: []       
+    }
   },
   { collection: "modules" }
 );

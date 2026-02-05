@@ -1,39 +1,52 @@
 //import db from "../Database/index.js"; 
 import * as dao from "./dao.js" 
 
-export default function ModuleRoutes(app) { 
+export default function ModuleRoutes(app) {  
 
-  const createModule = async (req, res) => {
-    const { cid } = req.params;
-    const module = await dao.createModule({ ...req.body, course: cid });
-    res.json(module);
-  }
-
-  const findAllModules = async (req, res) => {
-    const { cid } = req.params;
-    const modules = await dao.findAllModules();
+  
+  const findModuleByCourseId = async (req, res) => {
+    const modules = await dao.findModuleByCourseId(req.params.cid);
     res.json(modules);
-  }
+  };
 
   const findModuleById = async (req, res) => {
-    const { mid } = req.params;
-    const module = await dao.findModuleById(mid);
+    const module = await dao.findModuleById(req.params.mid);
     res.json(module);
+  };
+
+  const createModule = async (req, res) => {
+  try {
+    const module = { ...req.body, course: req.params.cid }; // ✅ use 'course' now
+    const newModule = await dao.createModule(module);
+    res.json(newModule);
+  } catch (err) {
+    console.error("Error creating module:", err);
+    res.status(400).send({ message: "Unable to create module", error: err.message });
   }
+};
 
   const updateModule = async (req, res) => {
     const { mid } = req.params;
-    await dao.updateModule(mid, req.body);
-    res.sendStatus(204);
-  }
+    try {
+      const updated = await dao.updateModule(mid, req.body);
+      if (!updated) {
+        res.status(404).send({ message: "Module not found" });
+        return;
+      }
+      res.json(updated);
+    } catch (e) {
+      res.status(400).send({ message: "Unable to update module", error: e?.message });
+    }
+  }; 
 
   const deleteModule = async (req, res) => {
     const { mid } = req.params;
     await dao.deleteModule(mid);
-    res.sendStatus(200);
-  } 
+    res.sendStatus(204);
+  };  
 
-  app.get("/api/courses/:cid/modules", findAllModules);
+  //app.get("/api/courses/:cid/modules", findAllModules);
+  app.get("/api/courses/:cid/modules", findModuleByCourseId);
   app.get("/api/modules/:mid", findModuleById);
   app.post("/api/courses/:cid/modules", createModule);
   app.put("/api/modules/:mid", updateModule);
