@@ -1,37 +1,65 @@
-import db from "../Database/index.js";
+//import db from "../Database/index.js"; 
+//import model from "./model.js";
+import * as dao from "./dao.js";
 
-export default function AssignmentRoutes(app) {
+export default function AssignmentRoutes(app) { 
+
+
   // List assignments for a course
-  app.get("/api/courses/:cid/assignments", (req, res) => {
+  const findAssignmentsByCourseId = async (req, res) => {
     const { cid } = req.params;
-    const assignments = db.assignments.filter((a) => String(a.course) === String(cid));
+    const assignments = await dao.findAssignmentsByCourseId(cid);
     res.json(assignments);
-  });
-
+  };
   // Create assignment for a course
-  app.post("/api/courses/:cid/assignments", (req, res) => {
+  const createAssignmentForCourse = async (req, res) => {
     const { cid } = req.params;
-    const assignment = { ...req.body };
-    assignment.course = cid;
-    assignment._id = assignment._id ?? Date.now().toString();
-    db.assignments.push(assignment);
-    res.status(201).json(assignment);
+    const assignment = { ...req.body, course: cid };
+    // Ensure Mongoose generates a proper ObjectId
+    if (assignment._id) delete assignment._id;
+    try {
+      const createdAssignment = await dao.createAssignment(assignment);
+          res.status(201).json(createdAssignment);
+      } catch (e) {
+      res.status(400).send({ message: "Unable to create assignment", error: e?.message });
+    }
+  }; 
+
+  const deleteAssignment = async (req, res) => {
+     const { aid } = req.params;
+        await dao.deleteAssignment(aid);
+        res.sendStatus(204);
+   }; 
+
+  const updateAssignment = async (req, res) => { };   
+
+  app.get("/api/courses/:cid/assignments", findAssignmentsByCourseId);
+  app.post("/api/courses/:cid/assignments", createAssignmentForCourse);
+  app.delete("/api/assignments/:aid", deleteAssignment);
+  app.put("/api/assignments/:aid", updateAssignment);
+
+  
+  // Delete assignment by id (MongoDB)
+  app.delete("/api/assignments/:aid", async (req, res) => {
+    const { aid } = req.params;
+    try {
+      await model.deleteOne({ _id: aid });
+      res.sendStatus(204);
+    } catch (e) {
+      res.status(400).send({ message: "Unable to delete assignment", error: e?.message });
+    }
   });
 
-  // Delete by assignment id (unchanged)
-  app.delete("/api/assignments/:aid", (req, res) => {
+  // Update assignment by id (MongoDB)
+  app.put("/api/assignments/:aid", async (req, res) => {
     const { aid } = req.params;
-    db.assignments = db.assignments.filter((a) => String(a._id) !== String(aid));
-    res.sendStatus(200);
-  });
-
-  // Update by assignment id (return updated object)
-  app.put("/api/assignments/:aid", (req, res) => {
-    const { aid } = req.params;
-    const i = db.assignments.findIndex((a) => String(a._id) === String(aid));
-    if (i < 0) return res.sendStatus(404);
-    db.assignments[i] = { ...db.assignments[i], ...req.body };
-    res.json(db.assignments[i]);
+    try {
+      const updated = await model.findByIdAndUpdate(aid, req.body, { new: true });
+      if (!updated) return res.status(404).send({ message: "Assignment not found" });
+      res.json(updated);
+    } catch (e) {
+      res.status(400).send({ message: "Unable to update assignment", error: e?.message });
+    }
   });
 
   // Optional: keep old module-scoped routes temporarily for compatibility
